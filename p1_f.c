@@ -26,7 +26,7 @@ typedef struct {
 
 int parse_int(const char *arg, const char *nombre, long min, long max){
     char *endptr;
-    errno = 0
+    errno = 0;
     long temp = strtol(arg, &endptr, 10);
     
     // validaciones de conversión ;)
