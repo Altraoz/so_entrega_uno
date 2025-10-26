@@ -53,28 +53,29 @@ int main() {
     }
 
     while (1) {
-        sem_wait(sem_2);
-        sem_wait(sem_3);
+        sem_wait(sem_2);          // FULL
+        sem_wait(sem_3);          // MUTEX
 
         int val = data->value;
 
-        sem_post(sem_3);
-        sem_post(sem_1);
+        sem_post(sem_3);          // MUTEX
+        sem_post(sem_1);          // EMPTY
 
-        // Si recibe el testigo de fin de P2 (-2), debe notificarle con -3 mediante FIFO
-        if (val == -1 || val == -2) {
-
-            printf("-3 P4 termina\n");
-
-            int fifo_fd;
+        if (val == -2) {          // testigo de P2
+            mkfifo("/tmp/fifo_p2", 0666);               // (hacerlo una vez)
+            int fd = open("/tmp/fifo_p2", O_WRONLY);
             int msg = -3;
-            ssize_t bytes_written = write(fifo_fd, &msg, sizeof(int));
+            write(fd, &msg, sizeof msg);
+            close(fd);
+            printf("-3 P4 termina\n");
+            break;
+        }
 
-            if (bytes_written != sizeof(int)) {
-
-                perror("Error al escribir en FIFO");
-            }
+        // imprimir solo tus potencias
+        printf("%d ", val);
+        fflush(stdout);
     }
+
 
     munmap(data, sizeof(shared_data));
     close(mem);

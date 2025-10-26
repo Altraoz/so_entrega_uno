@@ -65,6 +65,16 @@ void fibonacci(int a1, int a2, int n, shared_data *data,
     data->value = -1;
     sem_post(sem_3);
     sem_post(sem_2);
+
+    // Esperar confirmación de P4 mediante FIFO
+    int fd = open("/tmp/fifo_p1", O_RDONLY);
+    int msg;
+    read(fd, &msg, sizeof(msg));
+
+    if (msg == -3) {
+        printf("-3 p1 termina\n");
+    }
+    close(fd);
 }
 
 void power_of_two(int a3, int n, shared_data *data,
@@ -88,6 +98,16 @@ void power_of_two(int a3, int n, shared_data *data,
     data->value = -2;
     sem_post(sem_3);
     sem_post(sem_2);
+
+    // Esperar confirmación de P4 mediante FIFO
+    int fd = open("/tmp/fifo_p2", O_RDONLY);
+    int msg;
+    read(fd, &msg, sizeof(msg));
+
+    if (msg == -3) {
+        printf("-3 P2 termina\n");
+    }
+    close(fd);
 }
 
 

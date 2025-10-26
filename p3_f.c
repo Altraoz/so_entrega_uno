@@ -61,7 +61,6 @@ int main() {
     }
 
    //printf("Esperando P1\n");
-
     while (1) {
 
         sem_wait(sem_2);
@@ -72,13 +71,21 @@ int main() {
         sem_post(sem_3);
         sem_post(sem_1);
 
-        if (val == -1 || val == -2) break;
+        // Si el buffer recibe el testigo -1, p3 debe enviar -3 a p1 mediante FIFO
+        if (val == -1) {          // testigo de P1
+            mkfifo("/tmp/fifo_p1", 0666);               // (hacerlo una vez)
+            int fd = open("/tmp/fifo_p1", O_WRONLY);
+            int msg = -3;
+            write(fd, &msg, sizeof msg);
+            close(fd);
+            printf("-3 P3 termina\n");
+            break;
+        }
+         // imprimir solo lo que te corresponda (Fibonacci) 
         printf("%d ", val);
         fflush(stdout);
-    }
 
-    printf("\n-3 P3 termina\n");
-    
+    }    
     munmap(data, sizeof(shared_data));
     close(mem);
     sem_close(sem_1);
