@@ -77,8 +77,8 @@ void power_of_two(int a3, int n, shared_data *data,
 
         int val = 1 << (a3 + i); // 2^(a3 + i)
 
-        sem_wait(sem_empty); // se bloquea si es 0, entra y decrementa a 0
-        sem_wait(sem_mutex); // 
+        sem_wait(sem_empty);
+        sem_wait(sem_mutex);
 
         data->value = val;
 
