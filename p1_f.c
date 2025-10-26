@@ -68,26 +68,26 @@ void fibonacci(int a1, int a2, int n, shared_data *data,
 }
 
 void power_of_two(int a3, int n, shared_data *data,
-                  sem_t *sem_empty, sem_t *sem_full, sem_t *sem_mutex) {
+                  sem_t *sem_1, sem_t *sem_2, sem_t *sem_3) {
 
     for (int i = 0; i < n; i++) {
 
         int val = 1 << (a3 + i); // 2^(a3 + i)
 
-        sem_wait(sem_empty); // se bloquea si es 0, entra y decrementa a 0
-        sem_wait(sem_mutex); // 
+        sem_wait(sem_1); // se bloquea si es 0, entra y decrementa a 0
+        sem_wait(sem_3); // 
 
         data->value = val;
 
-        sem_post(sem_mutex);
-        sem_post(sem_full);
+        sem_post(sem_3);
+        sem_post(sem_2);
     }
 
-    sem_wait(sem_empty);
-    sem_wait(sem_mutex);
+    sem_wait(sem_1);
+    sem_wait(sem_3);
     data->value = -2;
-    sem_post(sem_mutex);
-    sem_post(sem_full);
+    sem_post(sem_3);
+    sem_post(sem_2);
 }
 
 

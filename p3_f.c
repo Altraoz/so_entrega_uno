@@ -1,5 +1,5 @@
 //intento
-/asdasd
+//asdasd
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -43,7 +43,7 @@ int main() {
         exit(1);
     }
 
-    data = mmap(NULL, sizeof(shared_data), PROT_READ | PROT_WRITE, MAP_SHARED, mem, 0);
+    data=mmap(NULL, sizeof(shared_data), PROT_READ|PROT_WRITE, MAP_SHARED, mem, 0);
     if (data == MAP_FAILED) { 
 
         perror("Error mmap"); 
