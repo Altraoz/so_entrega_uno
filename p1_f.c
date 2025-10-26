@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
 
     char *endptr;
     long temp;
-    int N, a1, a2, a3;
+    // int N, a1, a2, a3;
 
     int N = parse_int(argv[1], "N", 0, INT_MAX);
     int a1 = parse_int(argv[2], "a1", INT_MIN, INT_MAX);
