@@ -1,3 +1,5 @@
+//puras pruebas
+
 #include <stdio.h>
 #include <unistd.h>
 #include <unistd.h>
@@ -161,3 +163,44 @@ if (argc != 5) {
         exit(1);
 
     }
+
+
+// asdasd
+
+
+
+int main(int argc, char *argv[]) {
+    sem_t *sem_empty, *sem_full, *sem_mutex;
+    int val_empty, val_full, val_mutex;
+
+    //ntenta abrir los semáforos
+    sem_empty = sem_open(SEM_EMPTY, 0);
+    sem_full  = sem_open(SEM_FULL, 0);
+    sem_mutex = sem_open(SEM_MUTEX, 0);
+
+    if (sem_empty == SEM_FAILED || sem_full == SEM_FAILED || sem_mutex == SEM_FAILED) {
+        perror("Error al abrir semáforos");
+        fprintf(stderr, "P3 o P4 no están en ejecución.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    //verifica con getvalue
+    if (sem_getvalue(sem_empty, &val_empty) == -1 ||
+        sem_getvalue(sem_full, &val_full) == -1 ||
+        sem_getvalue(sem_mutex, &val_mutex) == -1) {
+        perror("sem_getvalue");
+        fprintf(stderr, "P3 o P4 estén en ejecución.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    //si val es invalido, no estan bien inicializados
+    if (val_empty < 0 || val_full < 0 || val_mutex < 0) {
+        fprintf(stderr, "P3 o P4 no están correctamente inicializados.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    /* A partir de aquí, P1 puede crear a P2 */
+    // fork() + exec() a P2, etc.
+
+    return 0;
+}
