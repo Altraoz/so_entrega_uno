@@ -34,29 +34,25 @@ static int parse_int(const char *arg, const char *name, long lo, long hi) {
 }
 
 // ----- P1: Fibonacci -----
+// ----- P1: Fibonacci (emite N términos comenzando en a1+a2) -----
 static void run_fibo(int a1, int a2, int N,
-                     shared_data *buf,
-                     sem_t *empty, sem_t *full, sem_t *mutex) {
+    shared_data *buf,
+    sem_t *empty, sem_t *full, sem_t *mutex) {
+    int prev = a1;
+    int curr = a2;
 
     for (int i = 0; i < N; i++) {
-        int val;
-        if (i == 0) val = a1;
-        else if (i == 1) val = a2;
-        else {
-            int next = a1 + a2;
-            a1 = a2; a2 = next;
-            val = a2;
-        }
-
-
-        printf("F(%d) = %d\n", i, val);
-
+        int next = prev + curr;   // primer término a emitir
+        // printf("F(%d) = %d\n", i, next); // opcional: etiqueta de depuración
 
         sem_wait(empty);
         sem_wait(mutex);
-        buf->value = val;
+        buf->value = next;
         sem_post(mutex);
         sem_post(full);
+
+        prev = curr;
+        curr = next;
     }
 
     // testigo -1 para P3
