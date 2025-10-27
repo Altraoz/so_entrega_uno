@@ -33,7 +33,7 @@ int main() {
         perror("p3 sem_open"); exit(1);
     }
 
-    printf("Esperando P1\n")
+    printf("Esperando P1\n");
 
     // 2) Consumir SOLO Fibonacci (producido por P1) hasta recibir -1
     while (1) {
