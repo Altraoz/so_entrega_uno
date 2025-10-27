@@ -48,7 +48,6 @@ static void run_fibo(int a1, int a2, int N,
     for (int i = 0; i < N; i++) {
         int next = prev + curr;   // primer término a emitir
         // printf("F(%d) = %d\n", i, next); // opcional: etiqueta de depuración
-        
         sem_wait(turn_p1);  // Esperar turno de P1
         sem_wait(empty);
         sem_wait(mutex);
@@ -167,10 +166,12 @@ int main(int argc, char **argv) {
 
     if (pid == 0) {
         // ejecutar p2
+        sem_wait(turn_p1);
         run_pow(a3, N, buffer, empty, full, mutex, turn_p2, turn_p4);
         _exit(0);
     } else {
         // ejecutar p1
+        sem_wait(turn_p1);
         run_fibo(a1, a2, N, buffer, empty, full, mutex, turn_p1, turn_p3);
         int st; waitpid(pid, &st, 0);
         // limpieza
