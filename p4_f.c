@@ -1,4 +1,3 @@
-// p4_f.c  (Consumidor Potencias, CREADOR de recursos Potencias)
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
