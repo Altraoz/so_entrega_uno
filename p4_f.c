@@ -30,11 +30,11 @@ int main() {
     sem_t *turn_p4 = sem_open(SEM_TURN_P4, 0);
 
 
-    int shm_f = shm_open(SHM, O_RDWR, 0666);
-    if (shm_f == -1) { perror("p1 shm_open fibo (¿p3 no corre?)"); exit(1); }
-    shared_data *buf_f = mmap(NULL, sizeof(shared_data),
-                              PROT_READ | PROT_WRITE, MAP_SHARED, shm_f, 0);
-    if (buf_f == MAP_FAILED) { perror("p1 mmap fibo"); exit(1); }
+    int shm = shm_open(SHM, O_RDWR, 0666);
+    if (shm == -1) { perror("p1 shm_open fibo (¿p3 no corre?)"); exit(1); }
+    shared_data *buffer = mmap(NULL, sizeof(shared_data),
+                              PROT_READ | PROT_WRITE, MAP_SHARED, shm, 0);
+    if (buffer == MAP_FAILED) { perror("p1 mmap fibo"); exit(1); }
     sem_t *empty = sem_open(SEM_EMPTY, 0);
     sem_t *full  = sem_open(SEM_FULL,  0);
     sem_t *mutex = sem_open(SEM_MUTEX, 0);
@@ -50,7 +50,7 @@ int main() {
         sem_wait(full);
         sem_wait(mutex);
 
-        int val = buf_f->value;
+        int val = buffer->value;
 
         sem_post(turn_p1);  // Ceder turno a P1
         sem_post(mutex);
@@ -75,8 +75,8 @@ int main() {
     }
 
     // 3) Limpieza RECURSOS Potencias
-    munmap(buf_f, sizeof(shared_data));
-    close(shm_f);
+    munmap(buffer, sizeof(shared_data));
+    close(shm);
     sem_close(empty); sem_close(full); sem_close(mutex);
     // Dejar unlink para el final si aún pueden estar abiertos:
     // sem_unlink(SEM_P_EMPTY); sem_unlink(SEM_P_FULL); sem_unlink(SEM_P_MUTEX); shm_unlink(SHM_POW);
