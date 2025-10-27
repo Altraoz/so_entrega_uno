@@ -45,6 +45,16 @@ int main() {
     }
     printf("Esperando P1\n");
 
+    int v_empty, v_mutex, v_turn2;
+
+    sem_getvalue(empty, &v_empty);
+    sem_getvalue(mutex, &v_mutex);
+    sem_getvalue(turn_p2, &v_turn2);
+
+    printf("[PRE] empty=%d mutex=%d turn_p2=%d\n", v_empty, v_mutex, v_turn2);
+    fflush(stdout);
+
+
     // 2) Consumir SOLO Fibonacci (producido por P1) hasta recibir -1
     while (1) {
         sem_wait(full);
