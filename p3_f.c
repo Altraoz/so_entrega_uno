@@ -13,6 +13,10 @@
 #define SEM_F_EMPTY   "/sem_fibo_empty"
 #define SEM_F_FULL    "/sem_fibo_full"
 #define SEM_F_MUTEX   "/sem_fibo_mutex"
+#define SEM_TURN_P1   "/sem_turn_p1"
+#define SEM_TURN_P2   "/sem_turn_p2"
+#define SEM_TURN_P3   "/sem_turn_p3"
+#define SEM_TURN_P4   "/sem_turn_p4"
 
 typedef struct { int value; } shared_data;
 
@@ -29,21 +33,29 @@ int main() {
     sem_t *empty = sem_open(SEM_F_EMPTY, O_CREAT, 0666, 1);
     sem_t *full  = sem_open(SEM_F_FULL,  O_CREAT, 0666, 0);
     sem_t *mutex = sem_open(SEM_F_MUTEX, O_CREAT, 0666, 1);
-    if (empty == SEM_FAILED || full == SEM_FAILED || mutex == SEM_FAILED) {
+    sem_t *turn_p1 = sem_open(SEM_TURN_P1, O_CREAT, 0666, 1);
+    sem_t *turn_p2 = sem_open(SEM_TURN_P2, O_CREAT, 0666, 0);
+    sem_t *turn_p3 = sem_open(SEM_TURN_P3, O_CREAT, 0666, 1);
+    sem_t *turn_p4 = sem_open(SEM_TURN_P4, O_CREAT, 0666, 0);
+
+    if (empty == SEM_FAILED || full == SEM_FAILED || 
+        mutex == SEM_FAILED || turn_p1 == SEM_FAILED || 
+        turn_p3 == SEM_FAILED || turn_p2 == SEM_FAILED || turn_p4 == SEM_FAILED) {
         perror("p3 sem_open"); exit(1);
     }
-
     printf("Esperando P1\n");
 
     // 2) Consumir SOLO Fibonacci (producido por P1) hasta recibir -1
     while (1) {
         sem_wait(full);
         sem_wait(mutex);
-
+        sem_wait(turn_p3);  // Esperar turno de P3
         int val = data->value;
-
         sem_post(mutex);
         sem_post(empty);
+        sem_post(turn_p2);  // Ceder turno a P2
+
+        // si es turno de p3 haga esto sino salte
 
         if (val == -1) {
             // Notificar a P1 por FIFO con -3

@@ -15,10 +15,10 @@
 #define SEM_F_FULL    "/sem_fibo_full"
 #define SEM_F_MUTEX   "/sem_fibo_mutex"
 
-#define SHM_POW      "/shm_pow"
-#define SEM_P_EMPTY  "/sem_pow_empty"
-#define SEM_P_FULL   "/sem_pow_full"
-#define SEM_P_MUTEX  "/sem_pow_mutex"
+#define SEM_TURN_P1   "/sem_turn_p1"
+#define SEM_TURN_P2   "/sem_turn_p2"
+#define SEM_TURN_P3   "/sem_turn_p3"
+#define SEM_TURN_P4   "/sem_turn_p4"
 
 typedef struct { int value; } shared_data;
 
@@ -36,9 +36,12 @@ static int parse_int(const char *arg, const char *name, long lo, long hi) {
 // ----- P1: Fibonacci (emite N términos comenzando en a1+a2) -----
 static void run_fibo(int a1, int a2, int N,
     shared_data *buf,
-    sem_t *empty, sem_t *full, sem_t *mutex) {
+    sem_t *empty, sem_t *full, sem_t *mutex, sem_t *turn_p1, sem_t *turn_p3) {
     int prev = a1;
     int curr = a2;
+
+
+    //EJECUTAR SI ES SU TURNO, LUEGO CEDERLO A P3
 
     for (int i = 0; i < N; i++) {
         int next = prev + curr;   // primer término a emitir
@@ -46,9 +49,11 @@ static void run_fibo(int a1, int a2, int N,
 
         sem_wait(empty);
         sem_wait(mutex);
+        sem_wait(turn_p1);  // Esperar turno de P1
         buf->value = next;
         sem_post(mutex);
         sem_post(full);
+        sem_post(turn_p3);  // Ceder turno a P2
 
         prev = curr;
         curr = next;
@@ -57,9 +62,11 @@ static void run_fibo(int a1, int a2, int N,
     // testigo -1 para P3
     sem_wait(empty);
     sem_wait(mutex);
+    sem_wait(turn_p1);  // Esperar turno de P1
     buf->value = -1;
     sem_post(mutex);
     sem_post(full);
+    sem_post(turn_p3);  // Ceder turno a P3
 
     // Espera -3 de P3
     int fd = open("/tmp/fifo_p1", O_RDONLY);
@@ -72,24 +79,31 @@ static void run_fibo(int a1, int a2, int N,
 // ----- P2: Potencias -----
 static void run_pow(int a3, int N,
                     shared_data *buf,
-                    sem_t *empty, sem_t *full, sem_t *mutex) {
+                    sem_t *empty, sem_t *full, sem_t *mutex, sem_t *turn_p2, sem_t *turn_p4) {
+
+    //EJECUTAR SI ES TURNO DE P2, LUEGO CEDERLO A P4
+
 
     for (int i = 0; i < N; i++) {
         int val = 1 << (a3 + i);
 
         sem_wait(empty);
         sem_wait(mutex);
+        sem_wait(turn_p2);  // Esperar turno de P2
         buf->value = val;
         sem_post(mutex);
         sem_post(full);
+        sem_post(turn_p4);  // Ceder turno a P4
     }
 
     // testigo -2 para P4
     sem_wait(empty);
     sem_wait(mutex);
+    sem_wait(turn_p2);  // Esperar turno de P2
     buf->value = -2;
     sem_post(mutex);
     sem_post(full);
+    sem_post(turn_p4);  // Ceder turno a P4
 
     // Espera -3 de P4
     int fd = open("/tmp/fifo_p2", O_RDONLY);
@@ -109,7 +123,12 @@ int main(int argc, char **argv) {
     const int a2 = parse_int(argv[3], "a2", INT_MIN, INT_MAX);
     const int a3 = parse_int(argv[4], "a3", 0, 30);  // 2^(a3+i) simple
 
-    // 1) ABRIR recursos Fibonacci (creados por P3)
+    sem_t *turn_p1 = sem_open(SEM_TURN_P1, 0);
+    sem_t *turn_p2 = sem_open(SEM_TURN_P2, 0);
+    sem_t *turn_p3 = sem_open(SEM_TURN_P3, 0);
+    sem_t *turn_p4 = sem_open(SEM_TURN_P4, 0);
+
+    // 1) ABRIR recursos (creados por P3)
     int shm_f = shm_open(SHM_FIBO, O_RDWR, 0666);
     if (shm_f == -1) { perror("p1 shm_open fibo (¿p3 no corre?)"); exit(1); }
     shared_data *buf_f = mmap(NULL, sizeof(shared_data),
@@ -122,23 +141,9 @@ int main(int argc, char **argv) {
         perror("p1 sem_open fibo"); exit(1);
     }
 
-    // 2) ABRIR recursos Potencias (creados por P4)
-    int shm_p = shm_open(SHM_POW, O_RDWR, 0666);
-    if (shm_p == -1) { perror("p1 shm_open pow (¿p4 no corre?)"); exit(1); }
-    shared_data *buf_p = mmap(NULL, sizeof(shared_data),
-                              PROT_READ | PROT_WRITE, MAP_SHARED, shm_p, 0);
-    if (buf_p == MAP_FAILED) { perror("p1 mmap pow"); exit(1); }
-    sem_t *p_empty = sem_open(SEM_P_EMPTY, 0);
-    sem_t *p_full  = sem_open(SEM_P_FULL,  0);
-    sem_t *p_mutex = sem_open(SEM_P_MUTEX, 0);
-    if (p_empty==SEM_FAILED || p_full==SEM_FAILED || p_mutex==SEM_FAILED) {
-        perror("p1 sem_open pow"); exit(1);
-    }
-
     // 3) Validar que P3 y P4 están en ejecución con sem_getvalue (requisito)
-    int v1, v2, v3, w1, w2, w3;
-    if (sem_getvalue(f_empty, &v1) || sem_getvalue(f_full, &v2) || sem_getvalue(f_mutex, &v3) ||
-        sem_getvalue(p_empty, &w1) || sem_getvalue(p_full, &w2) || sem_getvalue(p_mutex, &w3)) {
+    int v1, v2, v3;
+    if (sem_getvalue(f_empty, &v1) || sem_getvalue(f_full, &v2) || sem_getvalue(f_mutex, &v3)) {
         perror("p1 sem_getvalue"); exit(1);
     }
 
@@ -148,17 +153,15 @@ int main(int argc, char **argv) {
 
     if (pid == 0) {
         // Hijo → P2: produce Potencias
-        run_pow(a3, N, buf_p, p_empty, p_full, p_mutex);
+        run_pow(a3, N, buf_f, f_empty, f_full, f_mutex, turn_p2, turn_p4);
         _exit(0);
     } else {
         // Padre → P1: produce Fibonacci
-        run_fibo(a1, a2, N, buf_f, f_empty, f_full, f_mutex);
+        run_fibo(a1, a2, N, buf_f, f_empty, f_full, f_mutex, turn_p1, turn_p3);
         int st; waitpid(pid, &st, 0);
         // Limpieza local
         munmap(buf_f, sizeof(shared_data)); close(shm_f);
-        munmap(buf_p, sizeof(shared_data)); close(shm_p);
         sem_close(f_empty); sem_close(f_full); sem_close(f_mutex);
-        sem_close(p_empty); sem_close(p_full); sem_close(p_mutex);
     }
     return 0;
 }
