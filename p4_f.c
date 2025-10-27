@@ -9,10 +9,10 @@
 #include <string.h>
 #include <errno.h>
 
-#define SHM_POW      "/shm_pow"
-#define SEM_P_EMPTY  "/sem_pow_empty"
-#define SEM_P_FULL   "/sem_pow_full"
-#define SEM_P_MUTEX  "/sem_pow_mutex"
+#define SHM_FIBO      "/shm_fibo"
+#define SEM_F_EMPTY   "/sem_fibo_empty"
+#define SEM_F_FULL    "/sem_fibo_full"
+#define SEM_F_MUTEX   "/sem_fibo_mutex"
 
 #define SEM_TURN_P1   "/sem_turn_p1"
 #define SEM_TURN_P2   "/sem_turn_p2"
