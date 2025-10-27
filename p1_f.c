@@ -48,6 +48,10 @@ static void run_fibo(int a1, int a2, int N,
             val = a2;
         }
 
+
+        printf("F(%d) = %d\n", i, val);
+
+
         sem_wait(empty);
         sem_wait(mutex);
         buf->value = val;
