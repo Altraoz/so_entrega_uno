@@ -160,7 +160,6 @@ int main(int argc, char **argv) {
         munmap(buf_p, sizeof(shared_data)); close(shm_p);
         sem_close(f_empty); sem_close(f_full); sem_close(f_mutex);
         sem_close(p_empty); sem_close(p_full); sem_close(p_mutex);
-        printf("-3 P1 termina\n");
     }
     return 0;
 }
