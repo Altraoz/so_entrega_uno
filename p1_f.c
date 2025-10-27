@@ -87,10 +87,6 @@ static void run_pow(int a3, int N,
 
     for (int i = 0; i < N; i++) {
         int val = 1 << (a3 + i);
-       printf("[PRE][P2 pid=%d i=%d] empty=%d mutex=%d turn_p2=%d\n",
-        getpid(), i, empty, mutex, turn_p2);
-        fflush(stdout);
-
         sem_wait(empty);
         sem_wait(mutex);
         sem_wait(turn_p2);  // Esperar turno de P2
@@ -154,6 +150,10 @@ int main(int argc, char **argv) {
 
     // 4) Crear P2 y ejecutar ambos productores en paralelo (o secuencial si prefieres)
     pid_t pid = fork();
+
+    printf("[PRE][P2 pid=%d i=%d] empty=%d mutex=%d turn_p2=%d\n",
+    getpid(), i, f_empty, f_mutex, turn_p2);
+    fflush(stdout);
     if (pid < 0) { perror("p1 fork"); exit(1); }
 
     if (pid == 0) {
