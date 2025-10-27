@@ -152,8 +152,17 @@ int main(int argc, char **argv) {
     // 4) Crear P2 y ejecutar ambos productores en paralelo (o secuencial si prefieres)
     pid_t pid = fork();
 
-    printf("[PRE] empty=%p mutex=%p turn_p2=%p\n", (void*)f_empty, (void*)f_mutex, (void*)turn_p2);
+    int v_empty, v_mutex, v_turn2;
+
+    sem_getvalue(f_empty, &v_empty);
+    sem_getvalue(f_mutex, &v_mutex);
+    sem_getvalue(turn_p2, &v_turn2);
+
+    printf("[PRE] empty=%d mutex=%d turn_p2=%d\n", v_empty, v_mutex, v_turn2);
     fflush(stdout);
+
+
+
     if (pid < 0) { perror("p1 fork"); exit(1); }
 
     if (pid == 0) {
