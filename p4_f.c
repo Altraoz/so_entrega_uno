@@ -78,8 +78,5 @@ int main() {
     munmap(buffer, sizeof(shared_data));
     close(shm);
     sem_close(empty); sem_close(full); sem_close(mutex);
-    // Dejar unlink para el final si aún pueden estar abiertos:
-    // sem_unlink(SEM_P_EMPTY); sem_unlink(SEM_P_FULL); sem_unlink(SEM_P_MUTEX); shm_unlink(SHM_POW);
-
     return 0;
 }
