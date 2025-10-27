@@ -19,6 +19,8 @@
 #define SEM_TURN_P3 "/sem_turn_p3"
 #define SEM_TURN_P4 "/sem_turn_p4"
 
+#define SEM_P4_READY "/sem_p4_ready"
+
 typedef struct { int value; } shared_data;
 
 int main() {
@@ -42,6 +44,9 @@ int main() {
     }
     printf("Esperando P2\n");
 
+    // semaforo de estado proceso p4
+    sem_t *p4_ready = sem_open(SEM_P4_READY, O_CREAT, 0666, 1);
+    if (p4_ready == SEM_FAILED) { perror("p4 sem_open"); exit(1); }
 
     //consumir p2
     while (1) {
@@ -76,6 +81,9 @@ int main() {
     // limpieza
     munmap(buffer, sizeof(shared_data));
     close(shm);
+    sem_close(p4_ready);
+
     sem_close(empty); sem_close(full); sem_close(mutex);
+    sem_unlink(SEM_P4_READY);
     return 0;
 }

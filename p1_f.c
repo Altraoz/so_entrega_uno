@@ -22,6 +22,10 @@
 #define SEM_TURN_P3 "/sem_turn_p3"
 #define SEM_TURN_P4 "/sem_turn_p4"
 
+#define SEM_P3_READY "/sem_p3_ready"
+#define SEM_P4_READY "/sem_p4_ready"
+
+
 
 typedef struct { int value; } shared_data;
 
@@ -154,8 +158,9 @@ int main(int argc, char **argv) {
     }
 
     // validar que p3 y p4 están en ejecución
-    if (turn_p3==SEM_FAILED || turn_p4==SEM_FAILED) {
-        fprintf(stderr, "P3 o P4 no están en ejecución\n"); exit(1);
+    sem_t *sem_p4_ready = sem_open(SEM_P4_READY, 0);
+    if (sem_p4_ready==SEM_FAILED) {
+        fprintf(stderr, "P4 no están en ejecución\n"); exit(1);
     }
 
 
