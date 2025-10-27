@@ -33,7 +33,7 @@ int main() {
         perror("p4 sem_open"); exit(1);
     }
 
-    printf("Esperando P2\n")
+    printf("Esperando P2\n");
 
 
     // 2) Consumir SOLO Potencias (producido por P2) hasta recibir -2
