@@ -138,10 +138,10 @@ int main(int argc, char **argv) {
 
     // abrir SHM y semáforos
     int shm = shm_open(SHM, O_RDWR, 0666);
-    if (shm == -1) { perror("p1 shm_open fibo (¿p3 no corre?)"); exit(1); }
+    if (shm == -1) { perror("p1 shm_open (¿p3 no corre?)"); exit(1); }
     shared_data *buffer = mmap(NULL, sizeof(shared_data),
                               PROT_READ | PROT_WRITE, MAP_SHARED, shm, 0);
-    if (buffer == MAP_FAILED) { perror("p1 mmap fibo"); exit(1); }
+    if (buffer == MAP_FAILED) { perror("p1 mmap"); exit(1); }
     sem_t *empty = sem_open(SEM_EMPTY, 0);
     sem_t *full  = sem_open(SEM_FULL,  0);
     sem_t *mutex = sem_open(SEM_MUTEX, 0);
@@ -150,20 +150,16 @@ int main(int argc, char **argv) {
     sem_t *turn_p3 = sem_open(SEM_TURN_P3, 0);
     sem_t *turn_p4 = sem_open(SEM_TURN_P4, 0);
     if (empty==SEM_FAILED || full==SEM_FAILED || mutex==SEM_FAILED ||
-        turn_p1==SEM_FAILED || turn_p2==SEM_FAILED || turn_p3==SEM_FAILED || turn_p4==SEM_FAILED) {
-        perror("p1 sem_open fibo"); exit(1);
+        turn_p1==SEM_FAILED || turn_p2==SEM_FAILED) {
+        perror("p1 sem_open"); exit(1);
     }
 
-    printf("Iniciando P1 y creando P2\n");
-
     // validar que p3 y p4 están en ejecución
-    int val;
-    printf("valores: P3=%d P4=%d\n", sem_getvalue(turn_p3, &val), sem_getvalue(turn_p4, &val));
-
-    if (sem_getvalue(turn_p3, &val) == -1 || sem_getvalue(turn_p4, &val) == -1) {
+    if (turn_p3==SEM_FAILED || turn_p4==SEM_FAILED) {
         fprintf(stderr, "P3 o P4 no están en ejecución\n");
         exit(1);
     }
+
 
     // crear p2 y ejecutar
     pid_t pid = fork();
