@@ -51,31 +51,31 @@ int main() {
         perror("Error mmap");
         exit(EXIT_FAILURE);
     }
-
     while (1) {
-        sem_wait(sem_2);          // FULL
-        sem_wait(sem_3);          // MUTEX
+        sem_wait(sem_2);
+        sem_wait(sem_3);
 
         int val = data->value;
 
-        sem_post(sem_3);          // MUTEX
-        sem_post(sem_1);          // EMPTY
-
-        if (val == -2) {          // testigo de P2
-            mkfifo("/tmp/fifo_p2", 0666);               // (hacerlo una vez)
-            int fd = open("/tmp/fifo_p2", O_WRONLY);
-            int msg = -3;
-            write(fd, &msg, sizeof msg);
-            close(fd);
-            printf("-3 P4 termina\n");
-            break;
-        }
-
-        // imprimir solo tus potencias
-        printf("%d ", val);
-        fflush(stdout);
+        sem_post(sem_3);
+        sem_post(sem_1);
     }
 
+
+    // Si recibe el testigo de fin de P2 (-2), debe notificarle con -3 mediante FIFO
+    if (val == -1 || val == -2) {
+
+        printf("-3 P4 termina\n");
+
+        int fifo_fd;
+        int msg = -3;
+        size_t bytes_written = write(fifo_fd, &msg, sizeof(int));
+
+        if (bytes_written != sizeof(int)) {
+
+            perror("Error al escribir en FIFO");
+        }
+    }
 
     munmap(data, sizeof(shared_data));
     close(mem);
@@ -85,4 +85,5 @@ int main() {
     sem_close(sem_3);
 
     return 0;
+
 }

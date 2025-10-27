@@ -38,30 +38,18 @@ int parse_int(const char *arg, const char *nombre, long min, long max){
 void fibonacci(int a1, int a2, int n, shared_data *data,
                sem_t *sem_1, sem_t *sem_2, sem_t *sem_3) {
 
-    for (int i = 0; i < n; i++) {
-        printf("-3 p1 termina\n");
-
-        int val;
-        if (i == 0) val = a1;
-        else if (i == 1) val = a2;
-        else {
-
-            val = a1 + a2;
-            a1 = a2;
-            a2 = val;
-
-        }
+    for (int i = 0; i < N; i++) {
+        int next = a1 + a2;
+        a1 = a2;
+        a2 = next;
 
         sem_wait(sem_1);
         sem_wait(sem_3);
 
-        data->value = val;
+        data->value = a1; // or next, depending on how you want to display it
 
         sem_post(sem_3);
         sem_post(sem_2);
-
-        printf("Fibonacci: (%d) = %d\n", i, val);
-
     }
 
     sem_wait(sem_1);
