@@ -136,7 +136,7 @@ int main(int argc, char **argv) {
     const int a2 = parse_int(argv[3], "a2", INT_MIN, INT_MAX);
     const int a3 = parse_int(argv[4], "a3", 0, 30);  // 2^(a3+i) simple
 
-    // abrir SHM y semáforos (creados por p3)
+    // abrir SHM y semáforos
     int shm = shm_open(SHM, O_RDWR, 0666);
     if (shm == -1) { perror("p1 shm_open fibo (¿p3 no corre?)"); exit(1); }
     shared_data *buffer = mmap(NULL, sizeof(shared_data),
@@ -154,7 +154,7 @@ int main(int argc, char **argv) {
         perror("p1 sem_open fibo"); exit(1);
     }
 
-    // validar que p3 y p4 están en ejecución con sem_getvalue
+    // validar que p3 y p4 están en ejecución
     int v1, v2, v3;
     if (sem_getvalue(empty, &v1) || sem_getvalue(full, &v2) || sem_getvalue(mutex, &v3)) {
         perror("p1 sem_getvalue"); exit(1);

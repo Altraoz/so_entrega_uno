@@ -1,4 +1,3 @@
-// p3_f.c  (Consumidor Fibonacci, CREADOR de recursos Fibonacci)
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -23,7 +22,7 @@
 typedef struct { int value; } shared_data;
 
 int main() {
-    // 1) Crear SHM y semáforos SOLO para la tubería Fibonacci
+    // crear shm y buffer
     int shm = shm_open(SHM, O_CREAT | O_RDWR, 0666);
     if (shm == -1) { perror("p3 shm_open"); exit(1); }
     if (ftruncate(shm, sizeof(shared_data)) == -1) { perror("p3 ftruncate"); exit(1); }
@@ -32,7 +31,7 @@ int main() {
                              PROT_READ | PROT_WRITE, MAP_SHARED, shm, 0);
     if (data == MAP_FAILED) { perror("p3 mmap"); exit(1); }
 
-    // antes de crear, borra los anteriores (ignora error si no existen)
+    // inicializar semáforos
     sem_t *empty = sem_open(SEM_EMPTY, O_CREAT, 0666, 1);
     sem_t *full  = sem_open(SEM_FULL,  O_CREAT, 0666, 0);
     sem_t *mutex = sem_open(SEM_MUTEX, O_CREAT, 0666, 1);
@@ -48,21 +47,19 @@ int main() {
     }
     printf("Esperando P1\n");
 
-    // 2) Consumir SOLO Fibonacci (producido por P1) hasta recibir -1
+    //consumir p1
     while (1) {
-        sem_wait(turn_p3);  // Esperar turno de P3
+        sem_wait(turn_p3);  // esperar turno de p3
         sem_wait(full);
         sem_wait(mutex);
 
         int val = data->value;
-        sem_post(turn_p2);  // Ceder turno a P2
+        sem_post(turn_p2);  // ceder turno a p2
         sem_post(mutex);
         sem_post(empty);
 
-        // si es turno de p3 haga esto sino salte
-
+        // notificar a p1 por FIFO con -3
         if (val == -1) {
-            // Notificar a P1 por FIFO con -3
             mkfifo("/tmp/fifo_p1", 0666);
             int fd = open("/tmp/fifo_p1", O_WRONLY);
             if (fd != -1) {
@@ -74,12 +71,12 @@ int main() {
             break;
         }
 
-        // Muestra SOLO Fibonacci
+        // mostrar valor leído
         printf("%d ", val);
         fflush(stdout);
     }
 
-    // 3) Cierre / limpieza de RECURSOS Fibonacci
+    /// limpieza
     munmap(data, sizeof(shared_data));
     close(shm);
     sem_close(empty); sem_close(full); sem_close(mutex);
