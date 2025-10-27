@@ -149,9 +149,6 @@ int main(int argc, char **argv) {
         perror("p1 sem_getvalue"); exit(1);
     }
 
-    // 4) Crear P2 y ejecutar ambos productores en paralelo (o secuencial si prefieres)
-    pid_t pid = fork();
-
     int v_empty, v_mutex, v_turn2;
 
     sem_getvalue(f_empty, &v_empty);
@@ -160,6 +157,11 @@ int main(int argc, char **argv) {
 
     printf("[PRE] empty=%d mutex=%d turn_p2=%d\n", v_empty, v_mutex, v_turn2);
     fflush(stdout);
+
+
+    // 4) Crear P2 y ejecutar ambos productores en paralelo (o secuencial si prefieres)
+    pid_t pid = fork();
+
 
 
 
