@@ -151,13 +151,12 @@ int main(int argc, char **argv) {
     sem_t *turn_p4 = sem_open(SEM_TURN_P4, 0);
     if (empty==SEM_FAILED || full==SEM_FAILED || mutex==SEM_FAILED ||
         turn_p1==SEM_FAILED || turn_p2==SEM_FAILED) {
-        perror("p1 sem_open"); exit(1);
+        fprintf(stderr, "P3 o P4 no están en ejecución\n"); exit(1);
     }
 
     // validar que p3 y p4 están en ejecución
     if (turn_p3==SEM_FAILED || turn_p4==SEM_FAILED) {
-        fprintf(stderr, "P3 o P4 no están en ejecución\n");
-        exit(1);
+        fprintf(stderr, "P3 o P4 no están en ejecución\n"); exit(1);
     }
 
 
