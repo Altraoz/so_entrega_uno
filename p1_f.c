@@ -166,14 +166,10 @@ int main(int argc, char **argv) {
     if (pid < 0) { perror("p1 fork"); exit(1); }
 
     if (pid == 0) {
-        printf("Hola mundo1\n");
-
         // Hijo → P2: produce Potencias
         run_pow(a3, N, buf_f, f_empty, f_full, f_mutex, turn_p2, turn_p4);
         _exit(0);
     } else {
-        printf("Hola mundo2\n");
-
         // Padre → P1: produce Fibonacci
         run_fibo(a1, a2, N, buf_f, f_empty, f_full, f_mutex, turn_p1, turn_p3);
         int st; waitpid(pid, &st, 0);
