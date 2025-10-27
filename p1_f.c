@@ -193,7 +193,7 @@ int main(int argc, char *argv[]) {
      }
 
     if (pid == 0) {
-        power_of_two(a3, N, data, sem_empty, sem_full, sem_mutex);
+        power_of_two(a3, N, data, sem_1, sem_2, sem_3);
         perror("execl");
         exit(1);
 
