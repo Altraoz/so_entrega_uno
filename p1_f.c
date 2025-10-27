@@ -143,21 +143,21 @@ int main(int argc, char **argv) {
     sem_t *turn_p4 = sem_open(SEM_TURN_P4, 0);
 
     // 1) ABRIR recursos (creados por P3)
-    int shm_f = shm_open(SHM, O_RDWR, 0666);
-    if (shm_f == -1) { perror("p1 shm_open fibo (¿p3 no corre?)"); exit(1); }
-    shared_data *buf_f = mmap(NULL, sizeof(shared_data),
-                              PROT_READ | PROT_WRITE, MAP_SHARED, shm_f, 0);
-    if (buf_f == MAP_FAILED) { perror("p1 mmap fibo"); exit(1); }
-    sem_t *f_empty = sem_open(SEM_EMPTY, 0);
-    sem_t *f_full  = sem_open(SEM_FULL,  0);
-    sem_t *f_mutex = sem_open(SEM_MUTEX, 0);
-    if (f_empty==SEM_FAILED || f_full==SEM_FAILED || f_mutex==SEM_FAILED) {
+    int shm = shm_open(SHM, O_RDWR, 0666);
+    if (shm == -1) { perror("p1 shm_open fibo (¿p3 no corre?)"); exit(1); }
+    shared_data *buffer = mmap(NULL, sizeof(shared_data),
+                              PROT_READ | PROT_WRITE, MAP_SHARED, shm, 0);
+    if (buffer == MAP_FAILED) { perror("p1 mmap fibo"); exit(1); }
+    sem_t *empty = sem_open(SEM_EMPTY, 0);
+    sem_t *full  = sem_open(SEM_FULL,  0);
+    sem_t *mutex = sem_open(SEM_MUTEX, 0);
+    if (empty==SEM_FAILED || full==SEM_FAILED || mutex==SEM_FAILED) {
         perror("p1 sem_open fibo"); exit(1);
     }
 
     // 3) Validar que P3 y P4 están en ejecución con sem_getvalue (requisito)
     int v1, v2, v3;
-    if (sem_getvalue(f_empty, &v1) || sem_getvalue(f_full, &v2) || sem_getvalue(f_mutex, &v3)) {
+    if (sem_getvalue(empty, &v1) || sem_getvalue(full, &v2) || sem_getvalue(mutex, &v3)) {
         perror("p1 sem_getvalue"); exit(1);
     }
     // 4) Crear P2 y ejecutar ambos productores en paralelo (o secuencial si prefieres)
@@ -170,15 +170,15 @@ int main(int argc, char **argv) {
 
     if (pid == 0) {
         // Hijo → P2: produce Potencias
-        run_pow(a3, N, buf_f, f_empty, f_full, f_mutex, turn_p2, turn_p4);
+        run_pow(a3, N, buffer, empty, full, mutex, turn_p2, turn_p4);
         _exit(0);
     } else {
         // Padre → P1: produce Fibonacci
-        run_fibo(a1, a2, N, buf_f, f_empty, f_full, f_mutex, turn_p1, turn_p3);
+        run_fibo(a1, a2, N, buffer, empty, full, mutex, turn_p1, turn_p3);
         int st; waitpid(pid, &st, 0);
         // Limpieza local
-        munmap(buf_f, sizeof(shared_data)); close(shm_f);
-        sem_close(f_empty); sem_close(f_full); sem_close(f_mutex);
+        munmap(buffer, sizeof(shared_data)); close(shm);
+        sem_close(empty); sem_close(full); sem_close(mutex);
     }
     return 0;
 }

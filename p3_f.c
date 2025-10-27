@@ -24,12 +24,12 @@ typedef struct { int value; } shared_data;
 
 int main() {
     // 1) Crear SHM y semáforos SOLO para la tubería Fibonacci
-    int shm_fd = shm_open(SHM, O_CREAT | O_RDWR, 0666);
-    if (shm_fd == -1) { perror("p3 shm_open"); exit(1); }
-    if (ftruncate(shm_fd, sizeof(shared_data)) == -1) { perror("p3 ftruncate"); exit(1); }
+    int shm = shm_open(SHM, O_CREAT | O_RDWR, 0666);
+    if (shm == -1) { perror("p3 shm_open"); exit(1); }
+    if (ftruncate(shm, sizeof(shared_data)) == -1) { perror("p3 ftruncate"); exit(1); }
 
     shared_data *data = mmap(NULL, sizeof(shared_data),
-                             PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
+                             PROT_READ | PROT_WRITE, MAP_SHARED, shm, 0);
     if (data == MAP_FAILED) { perror("p3 mmap"); exit(1); }
 
     // antes de crear, borra los anteriores (ignora error si no existen)
@@ -81,7 +81,7 @@ int main() {
 
     // 3) Cierre / limpieza de RECURSOS Fibonacci
     munmap(data, sizeof(shared_data));
-    close(shm_fd);
+    close(shm);
     sem_close(empty); sem_close(full); sem_close(mutex);
 
     return 0;
