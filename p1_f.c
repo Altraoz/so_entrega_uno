@@ -47,7 +47,7 @@ void fibonacci(int a1, int a2, int N, shared_data *data,
         sem_wait(sem_3);
 
         data->value = a1; // or next, depending on how you want to display it
-
+        printf("F(%d) = %d\n", i, data->value);
         sem_post(sem_3);
         sem_post(sem_2);
     }
