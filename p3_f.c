@@ -80,13 +80,6 @@ int main() {
     munmap(data, sizeof(shared_data));
     close(shm);
     sem_close(empty); sem_close(full); sem_close(mutex);
-
-    // limpieza
-    munmap(data, sizeof(shared_data));
-    close(shm);
-    sem_close(empty);
-    sem_close(full);
-    sem_close(mutex);
     sem_close(turn_p1);
     sem_close(turn_p2);
     sem_close(turn_p3);
@@ -101,7 +94,6 @@ int main() {
     sem_unlink(SEM_TURN_P3);
     sem_unlink(SEM_TURN_P4);
     shm_unlink(SHM);
-
 
     return 0;
 }
