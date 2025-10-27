@@ -173,8 +173,7 @@ int main(int argc, char **argv) {
     } else {
         // ejecutar p1
         printf("Child process running p1\n");
-
-        sem_wait(turn_p1);
+        sem_wait(turn_p2);
         run_fibo(a1, a2, N, buffer, empty, full, mutex, turn_p1, turn_p3);
         int st; waitpid(pid, &st, 0);
         // limpieza
