@@ -1,4 +1,3 @@
-// p1_f.c  (Productor doble: P1=Fibo y P2=Potencias; abre AMBOS pipelines ya creados por P3 y P4)
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -33,27 +32,27 @@ static int parse_int(const char *arg, const char *name, long lo, long hi) {
     return (int)v;
 }
 
-void fibonacci(int a1, int a2, int N, shared_data *data,
-               sem_t *sem_1, sem_t *sem_2, sem_t *sem_3) {
-                
-    int next;
+// ----- P1: Fibonacci -----
+// ----- P1: Fibonacci (emite N términos comenzando en a1+a2) -----
+static void run_fibo(int a1, int a2, int N,
+    shared_data *buf,
+    sem_t *empty, sem_t *full, sem_t *mutex) {
+    int prev = a1;
+    int curr = a2;
+
     for (int i = 0; i < N; i++) {
-        next = a1 + a2;
-        printf("%d", next);
-        if (i < N - 1) printf(", ");
-        a1 = a2;
-        a2 = next;
+        int next = prev + curr;   // primer término a emitir
+        // printf("F(%d) = %d\n", i, next); // opcional: etiqueta de depuración
+
+        sem_wait(empty);
+        sem_wait(mutex);
+        buf->value = next;
+        sem_post(mutex);
+        sem_post(full);
+
+        prev = curr;
+        curr = next;
     }
-
-    sem_wait(sem_1);
-    sem_wait(sem_3);
-
-    data->value = next;
-
-    sem_post(sem_3);
-    sem_post(sem_2);
-
-
 
     // testigo -1 para P3
     sem_wait(empty);
