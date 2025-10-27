@@ -154,6 +154,8 @@ int main(int argc, char **argv) {
         perror("p1 sem_open fibo"); exit(1);
     }
 
+    printf("Iniciando P1 y creando P2\n");
+
     // validar que p3 y p4 están en ejecución
     int val;
     if (sem_getvalue(turn_p3, &val) == -1 || sem_getvalue(turn_p4, &val) == -1) {
