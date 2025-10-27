@@ -38,8 +38,7 @@ int main() {
     sem_t *turn_p2 = sem_open(SEM_TURN_P2, 0);
     sem_t *turn_p3 = sem_open(SEM_TURN_P3, 0);
     sem_t *turn_p4 = sem_open(SEM_TURN_P4, 0);
-    if (empty==SEM_FAILED || full==SEM_FAILED || mutex==SEM_FAILED ç|| 
-        turn_p1==SEM_FAILED || turn_p2==SEM_FAILED || turn_p3==SEM_FAILED || turn_p4==SEM_FAILED) {
+    if (empty==SEM_FAILED || full==SEM_FAILED || mutex==SEM_FAILED || turn_p1==SEM_FAILED || turn_p2==SEM_FAILED || turn_p3==SEM_FAILED || turn_p4==SEM_FAILED) {
         perror("p4 sem_open"); exit(1);
     }
     printf("Esperando P2\n");
