@@ -30,13 +30,23 @@ int main() {
                              PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
     if (data == MAP_FAILED) { perror("p3 mmap"); exit(1); }
 
-    sem_t *empty = sem_open(SEM_F_EMPTY, O_CREAT, 0666, 1);
-    sem_t *full  = sem_open(SEM_F_FULL,  O_CREAT, 0666, 0);
-    sem_t *mutex = sem_open(SEM_F_MUTEX, O_CREAT, 0666, 1);
-    sem_t *turn_p1 = sem_open(SEM_TURN_P1, O_CREAT, 0666, 0);
-    sem_t *turn_p2 = sem_open(SEM_TURN_P2, O_CREAT, 0666, 1);
-    sem_t *turn_p3 = sem_open(SEM_TURN_P3, O_CREAT, 0666, 0);
-    sem_t *turn_p4 = sem_open(SEM_TURN_P4, O_CREAT, 0666, 0);
+    // antes de crear, borra los anteriores (ignora error si no existen)
+    sem_unlink("/sem_fibo_empty");
+    sem_unlink("/sem_fibo_full");
+    sem_unlink("/sem_fibo_mutex");
+    sem_unlink("/sem_turn_p1");
+    sem_unlink("/sem_turn_p2");
+    sem_unlink("/sem_turn_p3");
+    sem_unlink("/sem_turn_p4");
+
+    // crea nuevos, frescos:
+    sem_t *empty = sem_open("/sem_fibo_empty", O_CREAT | O_EXCL, 0666, 1);
+    sem_t *full  = sem_open("/sem_fibo_full",  O_CREAT | O_EXCL, 0666, 0);
+    sem_t *mutex = sem_open("/sem_fibo_mutex", O_CREAT | O_EXCL, 0666, 1);
+    sem_t *turn_p1 = sem_open("/sem_turn_p1", O_CREAT | O_EXCL, 0666, 0);
+    sem_t *turn_p2 = sem_open("/sem_turn_p2", O_CREAT | O_EXCL, 0666, 1);
+    sem_t *turn_p3 = sem_open("/sem_turn_p3", O_CREAT | O_EXCL, 0666, 0);
+    sem_t *turn_p4 = sem_open("/sem_turn_p4", O_CREAT | O_EXCL, 0666, 0);
 
     if (empty == SEM_FAILED || full == SEM_FAILED || 
         mutex == SEM_FAILED || turn_p1 == SEM_FAILED || 
