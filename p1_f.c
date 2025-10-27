@@ -155,10 +155,12 @@ int main(int argc, char **argv) {
     }
 
     // validar que p3 y p4 están en ejecución
-    int v1, v2, v3;
-    if (sem_getvalue(empty, &v1) || sem_getvalue(full, &v2) || sem_getvalue(mutex, &v3)) {
-        perror("p1 sem_getvalue"); exit(1);
+    int val;
+    if (sem_getvalue(turn_p3, &val) == -1 || sem_getvalue(turn_p4, &val) == -1) {
+        fprintf(stderr, "P3 o P4 no están en ejecución\n");
+        exit(1);
     }
+
     // crear p2 y ejecutar
     pid_t pid = fork();
 
