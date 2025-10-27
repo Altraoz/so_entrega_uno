@@ -75,7 +75,7 @@ void power_of_two(int a3, int n, shared_data *data,
     for (int i = 0; i < n; i++) {
 
         int val = 1 << (a3 + i); // 2^(a3 + i)
-
+        printf("potencia (%d) = %d\n", i, val);
         sem_wait(sem_1); // se bloquea si es 0, entra y decrementa a 0
         sem_wait(sem_3); // 
 
