@@ -9,15 +9,16 @@
 #include <string.h>
 #include <errno.h>
 
-#define SHM_FIBO      "/shm_fibo"
-#define SEM_F_EMPTY   "/sem_fibo_empty"
-#define SEM_F_FULL    "/sem_fibo_full"
-#define SEM_F_MUTEX   "/sem_fibo_mutex"
+#define SHM "/shm"
 
-#define SEM_TURN_P1   "/sem_turn_p1"
-#define SEM_TURN_P2   "/sem_turn_p2"
-#define SEM_TURN_P3   "/sem_turn_p3"
-#define SEM_TURN_P4   "/sem_turn_p4"
+#define SEM_EMPTY "/sem_empty"
+#define SEM_FULL "/sem_full"
+#define SEM_MUTEX "/sem_mutex"
+
+#define SEM_TURN_P1 "/sem_turn_p1"
+#define SEM_TURN_P2 "/sem_turn_p2"
+#define SEM_TURN_P3 "/sem_turn_p3"
+#define SEM_TURN_P4 "/sem_turn_p4"
 
 typedef struct { int value; } shared_data;
 
@@ -29,14 +30,14 @@ int main() {
     sem_t *turn_p4 = sem_open(SEM_TURN_P4, 0);
 
 
-    int shm_f = shm_open(SHM_FIBO, O_RDWR, 0666);
+    int shm_f = shm_open(SHM, O_RDWR, 0666);
     if (shm_f == -1) { perror("p1 shm_open fibo (¿p3 no corre?)"); exit(1); }
     shared_data *buf_f = mmap(NULL, sizeof(shared_data),
                               PROT_READ | PROT_WRITE, MAP_SHARED, shm_f, 0);
     if (buf_f == MAP_FAILED) { perror("p1 mmap fibo"); exit(1); }
-    sem_t *empty = sem_open(SEM_F_EMPTY, 0);
-    sem_t *full  = sem_open(SEM_F_FULL,  0);
-    sem_t *mutex = sem_open(SEM_F_MUTEX, 0);
+    sem_t *empty = sem_open(SEM_EMPTY, 0);
+    sem_t *full  = sem_open(SEM_FULL,  0);
+    sem_t *mutex = sem_open(SEM_MUTEX, 0);
     if (empty==SEM_FAILED || full==SEM_FAILED || mutex==SEM_FAILED) {
         perror("p1 sem_open fibo"); exit(1);
     }
