@@ -45,16 +45,16 @@ int main() {
 
     // 2) Consumir SOLO Potencias (producido por P2) hasta recibir -2
     while (1) {
+        sem_wait(turn_p4);  // Esperar turno de P4
         sem_wait(full);
         sem_wait(mutex);
-        sem_wait(turn_p4);  // Esperar turno de P4
         printf("Hola desde p4\n");
 
         int val = buf_f->value;
 
+        sem_post(turn_p1);  // Ceder turno a P1
         sem_post(mutex);
         sem_post(empty);
-        sem_post(turn_p1);  // Ceder turno a P1
 
         if (val == -2) {
             // Notificar a P2 por FIFO con -3

@@ -57,15 +57,15 @@ int main() {
 
     // 2) Consumir SOLO Fibonacci (producido por P1) hasta recibir -1
     while (1) {
+        sem_wait(turn_p3);  // Esperar turno de P3
         sem_wait(full);
         sem_wait(mutex);
-        sem_wait(turn_p3);  // Esperar turno de P3
         printf("Hola desde p3\n");
 
         int val = data->value;
+        sem_post(turn_p2);  // Ceder turno a P2
         sem_post(mutex);
         sem_post(empty);
-        sem_post(turn_p2);  // Ceder turno a P2
 
         // si es turno de p3 haga esto sino salte
 

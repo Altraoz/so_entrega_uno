@@ -46,28 +46,28 @@ static void run_fibo(int a1, int a2, int N,
     for (int i = 0; i < N; i++) {
         int next = prev + curr;   // primer término a emitir
         // printf("F(%d) = %d\n", i, next); // opcional: etiqueta de depuración
-
+        
+        sem_wait(turn_p1);  // Esperar turno de P1
         sem_wait(empty);
         sem_wait(mutex);
-        sem_wait(turn_p1);  // Esperar turno de P1
         printf("Hola desde p1\n");
         buf->value = next;
+        sem_post(turn_p3);  // Ceder turno a P3
         sem_post(mutex);
         sem_post(full);
-        sem_post(turn_p3);  // Ceder turno a P3
 
         prev = curr;
         curr = next;
     }
 
     // testigo -1 para P3
+    sem_wait(turn_p1);  // Esperar turno de P1
     sem_wait(empty);
     sem_wait(mutex);
-    sem_wait(turn_p1);  // Esperar turno de P1
     buf->value = -1;
+    sem_post(turn_p3);  // Ceder turno a P3
     sem_post(mutex);
     sem_post(full);
-    sem_post(turn_p3);  // Ceder turno a P3
 
     // Espera -3 de P3
     int fd = open("/tmp/fifo_p1", O_RDONLY);
@@ -98,25 +98,25 @@ static void run_pow(int a3, int N,
 
 
         int val = 1 << (a3 + i);
+        sem_wait(turn_p2);  // Esperar turno de P2
         sem_wait(empty);
         sem_wait(mutex);
-        sem_wait(turn_p2);  // Esperar turno de P2
         
         printf("Hola desde p2\n");
         buf->value = val;
+        sem_post(turn_p4);  // Ceder turno a P4
         sem_post(mutex);
         sem_post(full);
-        sem_post(turn_p4);  // Ceder turno a P4
     }
 
     // testigo -2 para P4
+    sem_wait(turn_p2);  // Esperar turno de P2
     sem_wait(empty);
     sem_wait(mutex);
-    sem_wait(turn_p2);  // Esperar turno de P2
     buf->value = -2;
+    sem_post(turn_p4);  // Ceder turno a P4
     sem_post(mutex);
     sem_post(full);
-    sem_post(turn_p4);  // Ceder turno a P4
 
     // Espera -3 de P4
     int fd = open("/tmp/fifo_p2", O_RDONLY);
