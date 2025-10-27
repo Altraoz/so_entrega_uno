@@ -149,11 +149,10 @@ int main(int argc, char **argv) {
         perror("p1 sem_getvalue"); exit(1);
     }
 
-    printf("Hola mundo\n");
-
     // 4) Crear P2 y ejecutar ambos productores en paralelo (o secuencial si prefieres)
     pid_t pid = fork();
     if (pid < 0) { perror("p1 fork"); exit(1); }
+    printf("Hola mundo\n");
 
     if (pid == 0) {
         // Hijo → P2: produce Potencias
