@@ -87,7 +87,10 @@ static void run_pow(int a3, int N,
 
     for (int i = 0; i < N; i++) {
         int val = 1 << (a3 + i);
-        printf("Hola desde p2 pre\n");
+       
+        printf("[PRE][P2 pid=%d i=%d] empty=%d mutex=%d turn_p2=%d\n",
+        getpid(), i, v_empty, v_mutex, v_turn2);
+        fflush(stdout);
 
         sem_wait(empty);
         sem_wait(mutex);
