@@ -87,6 +87,7 @@ static void run_pow(int a3, int N,
 
     for (int i = 0; i < N; i++) {
         int val = 1 << (a3 + i);
+        printf("Hola desde p2 pre\n");
 
         sem_wait(empty);
         sem_wait(mutex);
