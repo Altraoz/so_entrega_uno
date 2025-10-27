@@ -90,7 +90,7 @@ static void run_pow(int a3, int N,
         sem_wait(empty);
         sem_wait(mutex);
         sem_wait(turn_p2);  // Esperar turno de P2
-        print("holaaaaa")
+        printf("holaaaaa\n");
         buf->value = val;
         sem_post(mutex);
         sem_post(full);
