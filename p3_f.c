@@ -60,7 +60,6 @@ int main() {
         sem_wait(turn_p3);  // Esperar turno de P3
         sem_wait(full);
         sem_wait(mutex);
-        printf("Hola desde p3\n");
 
         int val = data->value;
         sem_post(turn_p2);  // Ceder turno a P2

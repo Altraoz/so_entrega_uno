@@ -48,7 +48,6 @@ int main() {
         sem_wait(turn_p4);  // Esperar turno de P4
         sem_wait(full);
         sem_wait(mutex);
-        printf("Hola desde p4\n");
 
         int val = buf_f->value;
 

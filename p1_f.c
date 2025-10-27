@@ -50,7 +50,6 @@ static void run_fibo(int a1, int a2, int N,
         sem_wait(turn_p1);  // Esperar turno de P1
         sem_wait(empty);
         sem_wait(mutex);
-        printf("Hola desde p1\n");
         buf->value = next;
         sem_post(turn_p3);  // Ceder turno a P3
         sem_post(mutex);
@@ -87,14 +86,14 @@ static void run_pow(int a3, int N,
 
     for (int i = 0; i < N; i++) {
 
-        int v_empty, v_mutex, v_turn2;
+        // int v_empty, v_mutex, v_turn2;
 
-        sem_getvalue(empty, &v_empty);
-        sem_getvalue(mutex, &v_mutex);
-        sem_getvalue(turn_p2, &v_turn2);
+        // sem_getvalue(empty, &v_empty);
+        // sem_getvalue(mutex, &v_mutex);
+        // sem_getvalue(turn_p2, &v_turn2);
 
-        printf("[PRE]%d empty=%d mutex=%d turn_p2=%d\n", i, v_empty, v_mutex, v_turn2);
-        fflush(stdout);
+        // printf("[PRE]%d empty=%d mutex=%d turn_p2=%d\n", i, v_empty, v_mutex, v_turn2);
+        // fflush(stdout);
 
 
         int val = 1 << (a3 + i);
@@ -102,7 +101,6 @@ static void run_pow(int a3, int N,
         sem_wait(empty);
         sem_wait(mutex);
         
-        printf("Hola desde p2\n");
         buf->value = val;
         sem_post(turn_p4);  // Ceder turno a P4
         sem_post(mutex);
