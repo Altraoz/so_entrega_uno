@@ -33,9 +33,9 @@ int main() {
     sem_t *empty = sem_open(SEM_F_EMPTY, O_CREAT, 0666, 1);
     sem_t *full  = sem_open(SEM_F_FULL,  O_CREAT, 0666, 0);
     sem_t *mutex = sem_open(SEM_F_MUTEX, O_CREAT, 0666, 1);
-    sem_t *turn_p1 = sem_open(SEM_TURN_P1, O_CREAT, 0666, 1);
-    sem_t *turn_p2 = sem_open(SEM_TURN_P2, O_CREAT, 0666, 0);
-    sem_t *turn_p3 = sem_open(SEM_TURN_P3, O_CREAT, 0666, 1);
+    sem_t *turn_p1 = sem_open(SEM_TURN_P1, O_CREAT, 0666, 0);
+    sem_t *turn_p2 = sem_open(SEM_TURN_P2, O_CREAT, 0666, 1);
+    sem_t *turn_p3 = sem_open(SEM_TURN_P3, O_CREAT, 0666, 0);
     sem_t *turn_p4 = sem_open(SEM_TURN_P4, O_CREAT, 0666, 0);
 
     if (empty == SEM_FAILED || full == SEM_FAILED || 
