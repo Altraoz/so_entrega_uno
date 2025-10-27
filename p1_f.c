@@ -39,6 +39,7 @@ void fibonacci(int a1, int a2, int n, shared_data *data,
                sem_t *sem_1, sem_t *sem_2, sem_t *sem_3) {
 
     for (int i = 0; i < n; i++) {
+        printf("-3 p1 termina\n");
 
         int val;
         if (i == 0) val = a1;
@@ -58,6 +59,9 @@ void fibonacci(int a1, int a2, int n, shared_data *data,
 
         sem_post(sem_3);
         sem_post(sem_2);
+
+        printf("Fibonacci: (%d) = %d\n", i, val);
+
     }
 
     sem_wait(sem_1);
