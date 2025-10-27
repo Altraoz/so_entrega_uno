@@ -25,11 +25,11 @@ int main() {
     // crear shm y buffer
     int shm = shm_open(SHM, O_CREAT | O_RDWR, 0666);
     if (shm == -1) { perror("p3 shm_open"); exit(1); }
-    if (ftruncate(shm, sizeof(shared_data)) == -1) { perror("p3 ftruncate"); exit(1); }
+    if (ftruncate(shm, sizeof(shared_data)) == -1) { fprintf(stderr, "error creando shm\n"); exit(1); }
 
     shared_data *data = mmap(NULL, sizeof(shared_data),
                              PROT_READ | PROT_WRITE, MAP_SHARED, shm, 0);
-    if (data == MAP_FAILED) { perror("p3 mmap"); exit(1); }
+    if (data == MAP_FAILED) { fprintf(stderr, "error creando memoria compartida\n"); exit(1); }
 
     // inicializar semáforos
     sem_t *empty = sem_open(SEM_EMPTY, O_CREAT, 0666, 1);
@@ -43,7 +43,7 @@ int main() {
     if (empty == SEM_FAILED || full == SEM_FAILED || 
         mutex == SEM_FAILED || turn_p1 == SEM_FAILED || 
         turn_p3 == SEM_FAILED || turn_p2 == SEM_FAILED || turn_p4 == SEM_FAILED) {
-        perror("p3 sem_open"); exit(1);
+        fprintf(stderr, "error creando semáforos en p3\n"); exit(1);
     }
     printf("Esperando P1\n");
 
