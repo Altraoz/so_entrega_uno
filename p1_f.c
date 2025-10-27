@@ -50,6 +50,7 @@ static void run_fibo(int a1, int a2, int N,
         sem_wait(empty);
         sem_wait(mutex);
         sem_wait(turn_p1);  // Esperar turno de P1
+        printf("Hola desde p1\n");
         buf->value = next;
         sem_post(mutex);
         sem_post(full);
@@ -90,7 +91,7 @@ static void run_pow(int a3, int N,
         sem_wait(empty);
         sem_wait(mutex);
         sem_wait(turn_p2);  // Esperar turno de P2
-        // printf("holaaaaa\n");
+        printf("Hola desde p2\n");
         buf->value = val;
         sem_post(mutex);
         sem_post(full);
