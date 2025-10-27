@@ -54,7 +54,7 @@ int main() {
                 write(fd, &msg, sizeof msg);
                 close(fd);
             }
-            printf("-3 P3 termina\n");
+            printf("\n-3 P3 termina\n");
             break;
         }
 
