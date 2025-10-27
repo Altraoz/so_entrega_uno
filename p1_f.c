@@ -35,7 +35,7 @@ int parse_int(const char *arg, const char *nombre, long min, long max){
     }
 }
 
-void fibonacci(int a1, int a2, int n, shared_data *data,
+void fibonacci(int a1, int a2, int N, shared_data *data,
                sem_t *sem_1, sem_t *sem_2, sem_t *sem_3) {
 
     for (int i = 0; i < N; i++) {
