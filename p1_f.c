@@ -156,7 +156,7 @@ int main(int argc, char **argv) {
 
     // validar que p3 y p4 están en ejecución
     int val;
-    if (sem_getvalue(turn_p3, &val) == -1 || sem_getvalue(turn_p4, &val) == -1) {
+    if (sem_getvalue(turn_p3, &val) != 0 || sem_getvalue(turn_p4, &val) != 0) {
         fprintf(stderr, "P3 o P4 no están en ejecución\n");
         exit(1);
     }
