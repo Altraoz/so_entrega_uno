@@ -86,6 +86,17 @@ static void run_pow(int a3, int N,
 
 
     for (int i = 0; i < N; i++) {
+
+        int v_empty, v_mutex, v_turn2;
+
+        sem_getvalue(empty, &v_empty);
+        sem_getvalue(mutex, &v_mutex);
+        sem_getvalue(turn_p2, &v_turn2);
+
+        printf("[PRE] empty=%d mutex=%d turn_p2=%d\n", v_empty, v_mutex, v_turn2);
+        fflush(stdout);
+
+
         int val = 1 << (a3 + i);
         sem_wait(empty);
         sem_wait(mutex);
@@ -148,17 +159,6 @@ int main(int argc, char **argv) {
     if (sem_getvalue(f_empty, &v1) || sem_getvalue(f_full, &v2) || sem_getvalue(f_mutex, &v3)) {
         perror("p1 sem_getvalue"); exit(1);
     }
-
-    int v_empty, v_mutex, v_turn2;
-
-    sem_getvalue(f_empty, &v_empty);
-    sem_getvalue(f_mutex, &v_mutex);
-    sem_getvalue(turn_p2, &v_turn2);
-
-    printf("[PRE] empty=%d mutex=%d turn_p2=%d\n", v_empty, v_mutex, v_turn2);
-    fflush(stdout);
-
-
     // 4) Crear P2 y ejecutar ambos productores en paralelo (o secuencial si prefieres)
     pid_t pid = fork();
 
