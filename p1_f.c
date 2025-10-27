@@ -166,11 +166,14 @@ int main(int argc, char **argv) {
 
     if (pid == 0) {
         // ejecutar p2
+        printf("Child process running p2\n");
         sem_wait(turn_p1);
         run_pow(a3, N, buffer, empty, full, mutex, turn_p2, turn_p4);
         _exit(0);
     } else {
         // ejecutar p1
+        printf("Child process running p1\n");
+
         sem_wait(turn_p1);
         run_fibo(a1, a2, N, buffer, empty, full, mutex, turn_p1, turn_p3);
         int st; waitpid(pid, &st, 0);
