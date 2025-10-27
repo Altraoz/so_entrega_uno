@@ -138,10 +138,10 @@ int main(int argc, char **argv) {
 
     // abrir SHM y semáforos
     int shm = shm_open(SHM, O_RDWR, 0666);
-    if (shm == -1) { perror("p1 shm_open (¿p3 no corre?)"); exit(1); }
+    if (shm == -1) {fprintf(stderr, "P3 o P4 no están en ejecución\n"); exit(1);}
     shared_data *buffer = mmap(NULL, sizeof(shared_data),
                               PROT_READ | PROT_WRITE, MAP_SHARED, shm, 0);
-    if (buffer == MAP_FAILED) { perror("p1 mmap"); exit(1); }
+    if (buffer == MAP_FAILED) {fprintf(stderr, "P3 o P4 no están en ejecución\n"); exit(1);}
     sem_t *empty = sem_open(SEM_EMPTY, 0);
     sem_t *full  = sem_open(SEM_FULL,  0);
     sem_t *mutex = sem_open(SEM_MUTEX, 0);
