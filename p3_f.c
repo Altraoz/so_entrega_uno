@@ -17,7 +17,7 @@
 typedef struct { int value; } shared_data;
 
 int main() {
-    // 1) Crear SHM y semáforos SOLO para la tubería Fibonacci
+    // creación de shm y semaforos para fibonacci
     int shm_fd = shm_open(SHM_FIBO, O_CREAT | O_RDWR, 0666);
     if (shm_fd == -1) { perror("p3 shm_open"); exit(1); }
     if (ftruncate(shm_fd, sizeof(shared_data)) == -1) { perror("p3 ftruncate"); exit(1); }
@@ -35,7 +35,7 @@ int main() {
 
     printf("Esperando P1\n");
 
-    // 2) Consumir SOLO Fibonacci (producido por P1) hasta recibir -1
+    // leer a p1 hasta recibir -1
     while (1) {
         sem_wait(full);
         sem_wait(mutex);
@@ -46,7 +46,7 @@ int main() {
         sem_post(empty);
 
         if (val == -1) {
-            // Notificar a P1 por FIFO con -3
+            // notificar a p1
             mkfifo("/tmp/fifo_p1", 0666);
             int fd = open("/tmp/fifo_p1", O_WRONLY);
             if (fd != -1) {
@@ -58,20 +58,13 @@ int main() {
             break;
         }
 
-        // Muestra SOLO Fibonacci
         printf("%d ", val);
         fflush(stdout);
     }
 
-    // 3) Cierre / limpieza de RECURSOS Fibonacci
+    // cierre y limpieza
     munmap(data, sizeof(shared_data));
     close(shm_fd);
     sem_close(empty); sem_close(full); sem_close(mutex);
-
-    // IMPORTANTE: No hagas unlink aquí si P1 sigue vivo y podría reabrir.
-    // Solo el último en terminar debería hacer unlink. Para simplificar,
-    // puedes dejar los unlink en un script de limpieza al final de todas las ejecuciones:
-    // sem_unlink(SEM_F_EMPTY); sem_unlink(SEM_F_FULL); sem_unlink(SEM_F_MUTEX); shm_unlink(SHM_FIBO);
-
     return 0;
 }

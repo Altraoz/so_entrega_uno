@@ -6,10 +6,10 @@
 
 ## Autores
 
-| Nombre completo | Correo institucional |
-|------------------|----------------------|
-| **Carlos Daniel Urresty Ascuntar** | curresty@unal.edu.co |
-| **Felipe Aristizabal Giraldo** | faristizabalg@unal.edu.co |
+| Nombre completo | Correo institucional | Cédula |
+|------------------|----------------------|----------|
+| **Carlos Daniel Urresty Ascuntar** | curresty@unal.edu.co | 1006999238 |
+| **Felipe Aristizabal Giraldo** | faristizabalg@unal.edu.co | 1013458353 |
 
 ---
 

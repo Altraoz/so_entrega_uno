@@ -17,7 +17,7 @@
 typedef struct { int value; } shared_data;
 
 int main() {
-    // 1) Crear SHM y semáforos SOLO para la tubería Potencias
+    // creación de shm y semaforos para potencias
     int shm_fd = shm_open(SHM_POW, O_CREAT | O_RDWR, 0666);
     if (shm_fd == -1) { perror("p4 shm_open"); exit(1); }
     if (ftruncate(shm_fd, sizeof(shared_data)) == -1) { perror("p4 ftruncate"); exit(1); }
@@ -36,7 +36,7 @@ int main() {
     printf("Esperando P2\n");
 
 
-    // 2) Consumir SOLO Potencias (producido por P2) hasta recibir -2
+    // leer a p2 hasta recibir -2
     while (1) {
         sem_wait(full);
         sem_wait(mutex);
@@ -47,7 +47,7 @@ int main() {
         sem_post(empty);
 
         if (val == -2) {
-            // Notificar a P2 por FIFO con -3
+            // notificar a p2
             mkfifo("/tmp/fifo_p2", 0666);
             int fd = open("/tmp/fifo_p2", O_WRONLY);
             if (fd != -1) {
@@ -59,17 +59,13 @@ int main() {
             break;
         }
 
-        // Muestra SOLO Potencias
         printf("%d ", val);
         fflush(stdout);
     }
 
-    // 3) Limpieza RECURSOS Potencias
+    // cierre y limpieza
     munmap(data, sizeof(shared_data));
     close(shm_fd);
     sem_close(empty); sem_close(full); sem_close(mutex);
-    // Dejar unlink para el final si aún pueden estar abiertos:
-    // sem_unlink(SEM_P_EMPTY); sem_unlink(SEM_P_FULL); sem_unlink(SEM_P_MUTEX); shm_unlink(SHM_POW);
-
     return 0;
 }

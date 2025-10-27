@@ -1,4 +1,3 @@
-// p1_f.c  (Productor doble: P1=Fibo y P2=Potencias; abre AMBOS pipelines ya creados por P3 y P4)
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -33,8 +32,7 @@ static int parse_int(const char *arg, const char *name, long lo, long hi) {
     return (int)v;
 }
 
-// ----- P1: Fibonacci -----
-// ----- P1: Fibonacci (emite N términos comenzando en a1+a2) -----
+// algoritmo de fibonacci
 static void run_fibo(int a1, int a2, int N,
     shared_data *buf,
     sem_t *empty, sem_t *full, sem_t *mutex) {
@@ -42,9 +40,8 @@ static void run_fibo(int a1, int a2, int N,
     int curr = a2;
 
     for (int i = 0; i < N; i++) {
-        int next = prev + curr;   // primer término a emitir
-        // printf("F(%d) = %d\n", i, next); // opcional: etiqueta de depuración
-
+        int next = prev + curr;
+        // printf("F(%d) = %d\n", i, next);
         sem_wait(empty);
         sem_wait(mutex);
         buf->value = next;
@@ -70,7 +67,7 @@ static void run_fibo(int a1, int a2, int N,
     }
 }
 
-// ----- P2: Potencias -----
+// algoritmo de potencias
 static void run_pow(int a3, int N,
                     shared_data *buf,
                     sem_t *empty, sem_t *full, sem_t *mutex) {
@@ -92,7 +89,7 @@ static void run_pow(int a3, int N,
     sem_post(mutex);
     sem_post(full);
 
-    // Espera -3 de P4
+    // espera -3 de P4
     int fd = open("/tmp/fifo_p2", O_RDONLY);
     if (fd != -1) {
         int msg; read(fd, &msg, sizeof msg); close(fd);
@@ -108,9 +105,9 @@ int main(int argc, char **argv) {
     const int N  = parse_int(argv[1], "N", 1, INT_MAX);
     const int a1 = parse_int(argv[2], "a1", INT_MIN, INT_MAX);
     const int a2 = parse_int(argv[3], "a2", INT_MIN, INT_MAX);
-    const int a3 = parse_int(argv[4], "a3", 0, 30);  // 2^(a3+i) simple
+    const int a3 = parse_int(argv[4], "a3", 0, 30); 
 
-    // 1) ABRIR recursos Fibonacci (creados por P3)
+    // apertura de recursos para Fibonacci
     int shm_f = shm_open(SHM_FIBO, O_RDWR, 0666);
     if (shm_f == -1) { perror("p1 shm_open fibo (¿p3 no corre?)"); exit(1); }
     shared_data *buf_f = mmap(NULL, sizeof(shared_data),
@@ -123,7 +120,7 @@ int main(int argc, char **argv) {
         perror("p1 sem_open fibo"); exit(1);
     }
 
-    // 2) ABRIR recursos Potencias (creados por P4)
+    // apertura de recursos para potencias
     int shm_p = shm_open(SHM_POW, O_RDWR, 0666);
     if (shm_p == -1) { perror("p1 shm_open pow (¿p4 no corre?)"); exit(1); }
     shared_data *buf_p = mmap(NULL, sizeof(shared_data),
@@ -136,26 +133,26 @@ int main(int argc, char **argv) {
         perror("p1 sem_open pow"); exit(1);
     }
 
-    // 3) Validar que P3 y P4 están en ejecución con sem_getvalue (requisito)
+    // validación de p3 y p4 en ejecución
     int v1, v2, v3, w1, w2, w3;
     if (sem_getvalue(f_empty, &v1) || sem_getvalue(f_full, &v2) || sem_getvalue(f_mutex, &v3) ||
         sem_getvalue(p_empty, &w1) || sem_getvalue(p_full, &w2) || sem_getvalue(p_mutex, &w3)) {
         perror("p1 sem_getvalue"); exit(1);
     }
 
-    // 4) Crear P2 y ejecutar ambos productores en paralelo (o secuencial si prefieres)
+    // creación de p2
     pid_t pid = fork();
     if (pid < 0) { perror("p1 fork"); exit(1); }
 
     if (pid == 0) {
-        // Hijo → P2: produce Potencias
+        // ejecución de potencias
         run_pow(a3, N, buf_p, p_empty, p_full, p_mutex);
         _exit(0);
     } else {
-        // Padre → P1: produce Fibonacci
+        //ejecución de fibonacci
         run_fibo(a1, a2, N, buf_f, f_empty, f_full, f_mutex);
         int st; waitpid(pid, &st, 0);
-        // Limpieza local
+        // limpieza local
         munmap(buf_f, sizeof(shared_data)); close(shm_f);
         munmap(buf_p, sizeof(shared_data)); close(shm_p);
         sem_close(f_empty); sem_close(f_full); sem_close(f_mutex);
